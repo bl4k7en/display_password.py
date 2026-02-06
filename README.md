@@ -40,11 +40,13 @@ position_y - Custom Y position (optional, overrides default)
 How it works
 
 Reads /home/pi/handshakes/wpa-sec.cracked.potfile and displays the most recent cracked password in format: PASSWORD - SSID
+
 Potfile format: hash1:hash2:SSID:PASSWORD
 
 Requirements
 
 Working wpa-sec plugin
+
 Cracked passwords in potfile
 
 
