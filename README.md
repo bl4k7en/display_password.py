@@ -8,6 +8,7 @@ Original: @vanshksingh, @avipars
 Modified: bl4k7en
 
 Installation
+
 Copy display_password.py to /usr/local/share/pwnagotchi/custom-plugins/
 Configuration
 ```
