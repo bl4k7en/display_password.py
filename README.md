@@ -1,10 +1,12 @@
 DisplayPassword Plugin
 
 Description
+
 Displays recently cracked WPA passwords on the Pwnagotchi display.
 Authors
 
 Original: @vanshksingh, @avipars
+
 Modified: bl4k7en
 
 Installation
@@ -36,6 +38,7 @@ Working wpa-sec plugin
 Cracked passwords in potfile
 
 Default positions
+
 Plugin automatically adjusts position based on display type:
 
 Waveshare v2/v3/v4: (0, 95) horizontal / (180, 61) vertical
