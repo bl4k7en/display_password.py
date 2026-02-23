@@ -23,6 +23,10 @@ enabled = true
 orientation = "horizontal"
 position_x = 75
 position_y = 110
+max_ssid_len = 12
+show_count = true
+count_position_x = 160
+count_position_y = 67
 ```
 
 
