@@ -18,10 +18,11 @@ Installation
 Copy display_password.py to /usr/local/share/pwnagotchi/custom-plugins/
 Configuration
 ```
-main.plugins.display_password.enabled = true
-main.plugins.display_password.orientation = "horizontal"
-main.plugins.display_password.position_x = 10
-main.plugins.display_password.position_y = 100
+[main.plugins.display-password]
+enabled = true
+orientation = "horizontal"
+position_x = 10
+position_y = 100
 ```
 
 
