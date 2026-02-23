@@ -1,4 +1,4 @@
-from pwnagotchi.ui.components import LabeledValue
+from pwnagotchi.ui.components import LabeledValue, Text
 from pwnagotchi.ui.view import BLACK
 import pwnagotchi.ui.fonts as fonts
 import pwnagotchi.plugins as plugins
@@ -99,13 +99,11 @@ class DisplayPassword(plugins.Plugin):
 
             ui.add_element(
                 'display-password-count',
-                LabeledValue(
+                Text(
                     color=BLACK,
-                    label='',
                     value='',
                     position=count_pos,
-                    label_font=fonts.Bold,
-                    text_font=fonts.Small
+                    font=fonts.Small
                 )
             )
 
