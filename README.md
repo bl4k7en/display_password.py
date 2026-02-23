@@ -1,23 +1,19 @@
-DisplayPassword Plugin
-
-
-Description
+# DisplayPassword Plugin
 
 Displays recently cracked WPA passwords on the Pwnagotchi display.
 
+## Authors
 
-Authors
+- Original: [@vanshksingh](https://github.com/vanshksingh), [@avipars](https://github.com/avipars)
+- Modified: [@bl4k7en](https://github.com/bl4k7en)
 
-Original: @vanshksingh, @avipars
+## Installation
 
-Modified: bl4k7en
+Copy `display_password.py` to `/usr/local/share/pwnagotchi/custom-plugins/`
 
+## Configuration
 
-Installation
-
-Copy display_password.py to /usr/local/share/pwnagotchi/custom-plugins/
-Configuration
-```
+```toml
 [main.plugins.display-password]
 enabled = true
 orientation = "horizontal"
@@ -29,50 +25,41 @@ count_position_x = 160
 count_position_y = 67
 ```
 
+## Options
 
-Options
+| Option | Default | Description |
+|---|---|---|
+| `enabled` | `false` | Enable/disable the plugin |
+| `orientation` | `"horizontal"` | Display orientation: `"horizontal"` or `"vertical"` |
+| `position_x` | auto | Custom X position for password line (overrides default) |
+| `position_y` | auto | Custom Y position for password line (overrides default) |
+| `max_ssid_len` | `12` | Max SSID length before truncation (password is never truncated) |
+| `show_count` | `true` | Show total number of cracked passwords |
+| `count_position_x` | auto | Custom X position for count line (overrides default) |
+| `count_position_y` | auto | Custom Y position for count line (overrides default) |
 
+## How it works
 
-enabled - Enable/disable plugin (default: false)
+Reads `/home/pi/handshakes/wpa-sec.cracked.potfile` and displays:
+- The most recently cracked password: `PASSWORD - SSID`
+- Total count of cracked passwords: `Cracked: 299`
 
-orientation - Display orientation: "horizontal" or "vertical" (default: "horizontal")
+Long SSIDs are truncated with `…`, passwords are always shown in full.
 
-position_x - Custom X position (optional, overrides default)
+Potfile format: `hash1:hash2:SSID:PASSWORD`
 
-position_y - Custom Y position (optional, overrides default)
+## Requirements
 
+- Working `wpa-sec` plugin
+- Cracked passwords in potfile
 
+## Default positions
 
-How it works
-
-
-Reads /home/pi/handshakes/wpa-sec.cracked.potfile and displays the most recent cracked password in format: PASSWORD - SSID
-
-Potfile format: hash1:hash2:SSID:PASSWORD
-
-Requirements
-
-Working wpa-sec plugin
-
-Cracked passwords in potfile
-
-
-
-Default positions
-
-
-Plugin automatically adjusts position based on display type:
-
-
-
-Waveshare v2/v3/v4: (0, 95) horizontal / (180, 61) vertical
-
-Waveshare v1: (0, 95) horizontal / (170, 61) vertical
-
-Waveshare 1.44 LCD: (0, 92) horizontal / (78, 67) vertical
-
-Inky: (0, 83) horizontal / (165, 54) vertical
-
-Waveshare 2.7": (0, 153) horizontal / (216, 122) vertical
-
-Default: (0, 91) horizontal / (180, 61) vertical
+| Display | Horizontal | Vertical |
+|---|---|---|
+| Waveshare v2/v3/v4 | (0, 95) | (180, 61) |
+| Waveshare v1 | (0, 95) | (170, 61) |
+| Waveshare 1.44 LCD | (0, 92) | (78, 67) |
+| Inky | (0, 83) | (165, 54) |
+| Waveshare 2.7" | (0, 153) | (216, 122) |
+| Default | (0, 91) | (180, 61) |
