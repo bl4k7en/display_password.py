@@ -8,16 +8,19 @@ import os
 
 class DisplayPassword(plugins.Plugin):
     __author__ = '@vanshksingh, @avipars, @bl4k7en'
-    __version__ = '2.3.0'
+    __version__ = '2.4.0'
     __license__ = 'GPL3'
     __name__ = "DisplayPassword"
-    __description__ = 'Displays recently cracked WPA passwords on the Pwnagotchi display. SSID is truncated if too long, password is always shown in full.'
+    __description__ = 'Displays recently cracked WPA passwords and total count on the Pwnagotchi display.'
     __defaults__ = {
         "enabled": False,
         "orientation": "horizontal",
         "position_x": None,
         "position_y": None,
         "max_ssid_len": 12,
+        "show_count": True,
+        "count_position_x": None,
+        "count_position_y": None,
     }
 
     def on_loaded(self):
@@ -28,25 +31,38 @@ class DisplayPassword(plugins.Plugin):
             return text[:max_len - 1] + '…'
         return text
 
+    def _count_lines(self, potfile):
+        try:
+            with open(potfile, 'r', encoding='utf-8', errors='ignore') as f:
+                return sum(1 for line in f if line.strip())
+        except Exception:
+            return 0
+
     def on_ui_setup(self, ui):
         if ui.is_waveshare_v2() or ui.is_waveshare_v3() or ui.is_waveshare_v4():
             h_pos = (0, 95)
             v_pos = (180, 61)
+            h_count_pos = (0, 105)
         elif ui.is_waveshare_v1():
             h_pos = (0, 95)
             v_pos = (170, 61)
+            h_count_pos = (0, 105)
         elif ui.is_waveshare144lcd():
             h_pos = (0, 92)
             v_pos = (78, 67)
+            h_count_pos = (0, 102)
         elif ui.is_inky():
             h_pos = (0, 83)
             v_pos = (165, 54)
+            h_count_pos = (0, 93)
         elif ui.is_waveshare27inch():
             h_pos = (0, 153)
             v_pos = (216, 122)
+            h_count_pos = (0, 163)
         else:
             h_pos = (0, 91)
             v_pos = (180, 61)
+            h_count_pos = (0, 101)
 
         if self.options.get('orientation') == "vertical":
             position = v_pos
@@ -55,7 +71,6 @@ class DisplayPassword(plugins.Plugin):
 
         custom_x = self.options.get('position_x')
         custom_y = self.options.get('position_y')
-
         if custom_x is not None and custom_y is not None:
             position = (custom_x, custom_y)
             logging.info(f"[DisplayPassword] Using custom position: {position}")
@@ -73,14 +88,36 @@ class DisplayPassword(plugins.Plugin):
         )
         logging.info(f"[DisplayPassword] UI element added at {position}")
 
+        if self.options.get('show_count', True):
+            count_x = self.options.get('count_position_x')
+            count_y = self.options.get('count_position_y')
+            if count_x is not None and count_y is not None:
+                count_pos = (count_x, count_y)
+            else:
+                count_pos = h_count_pos
+                logging.info(f"[DisplayPassword] Count position: {count_pos}")
+
+            ui.add_element(
+                'display-password-count',
+                LabeledValue(
+                    color=BLACK,
+                    label='',
+                    value='',
+                    position=count_pos,
+                    label_font=fonts.Bold,
+                    text_font=fonts.Small
+                )
+            )
+
     def on_unload(self, ui):
         with ui._lock:
             ui.remove_element('display-password')
+            if self.options.get('show_count', True):
+                ui.remove_element('display-password-count')
         logging.info("[DisplayPassword] Plugin unloaded")
 
     def on_ui_update(self, ui):
         potfile = '/home/pi/handshakes/wpa-sec.cracked.potfile'
-
         max_ssid = self.options.get('max_ssid_len', 12)
 
         try:
@@ -92,29 +129,29 @@ class DisplayPassword(plugins.Plugin):
             if os.path.getsize(potfile) == 0:
                 logging.debug("[DisplayPassword] Potfile is empty")
                 ui.set('display-password', 'No passwords yet')
+                if self.options.get('show_count', True):
+                    ui.set('display-password-count', 'Cracked: 0')
                 return
 
             with open(potfile, 'r', encoding='utf-8', errors='ignore') as f:
                 lines = f.readlines()
 
-            if not lines:
+            valid_lines = [l for l in lines if l.strip()]
+
+            if not valid_lines:
                 ui.set('display-password', 'No passwords yet')
+                if self.options.get('show_count', True):
+                    ui.set('display-password-count', 'Cracked: 0')
                 return
 
-            last_line = ''
-            for line in reversed(lines):
-                if line.strip():
-                    last_line = line.strip()
-                    break
+            if self.options.get('show_count', True):
+                ui.set('display-password-count', f"Cracked: {len(valid_lines)}")
 
-            if not last_line:
-                ui.set('display-password', 'No passwords yet')
-                return
-
+            last_line = valid_lines[-1].strip()
             parts = last_line.split(':')
 
             if len(parts) >= 4:
-                ssid     = self._truncate(parts[2], max_ssid)
+                ssid = self._truncate(parts[2], max_ssid)
                 password = parts[3]
                 display_text = f"{password} - {ssid}"
                 logging.debug(f"[DisplayPassword] Showing: {display_text}")
